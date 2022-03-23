@@ -1,75 +1,63 @@
 (function() {
   const container = document.querySelector('.slide-2__container');
+  const viewport = document.querySelector('.slide-2__viewport');
+  const contentBox = document.querySelector('.slide-2__content-box');
+  const scrollbar = document.querySelector('.slide-2__scrollbar');
+  const scroller = document.querySelector('.slide-2__scroller');
+  const SCROLLER_HEIGHT_MIN = 30;
+  let pressed = false;
+  let viewportHeight;
+  let contentHeight;
 
-  class ScrollBox {
-		static SCROLLER_HEIGHT_MIN = 25;
+  function scrollbarInit () {
+    viewportHeight = viewport.offsetHeight;
+    contentHeight = contentBox.scrollHeight;
+    if (viewportHeight >= contentHeight) {
+      scrollbar.style = 'display: none';
+      return;
+    };
 
-		constructor(container) {
-			this.viewport = container.querySelector('.slide-2__viewport');
-			this.contentBox = container.querySelector('.slide-2__content-box');
-			this.pressed = false;
-			this.init();
-		}
+    const ratio = viewportHeight / contentHeight;
 
-		init() {
-			this.viewportHeight = this.viewport.offsetHeight;
-			this.contentHeight = this.contentBox.scrollHeight;
-			if (this.viewportHeight >= this.contentHeight) return;
+    createScrollbar(ratio);
 
-			this.max = this.viewport.clientHeight - this.contentHeight;
-			this.ratio = this.viewportHeight / this.contentHeight;
-			this.createScrollbar();
-			this.registerEventsHandler();
-		}
+    contentBox.addEventListener('scroll', (e) => {
+      scroller.style.top = (contentBox.scrollTop * ratio) + 'px';
+    });
+    scroller.addEventListener('mousedown', e => {
+      start = e.clientY;
+      pressed = true;
+    });
 
-		createScrollbar() {
-			const scrollbar = document.createElement('div'),
-				  scroller = document.createElement('div');
+    document.addEventListener('mousemove', (e) => {
+      if (pressed === false) return;
 
-			scrollbar.className = 'scrollbar';
-			scroller.className = 'scroller';
+      let shiftScroller = start - e.clientY;
+      scroller.style.top = (scroller.offsetTop - shiftScroller) + 'px';
 
-			scrollbar.appendChild(scroller);
-			this.viewport.append(scrollbar);
+      let shiftContent = scroller.offsetTop / ratio;
+      const totalHeightScroller = scroller.offsetHeight + scroller.offsetTop;
+      const maxOffsetScroller = viewportHeight - scroller.offsetHeight;
 
-			this.scroller = this.viewport.querySelector('.scroller');
-			this.scrollerHeight = parseInt(this.ratio * this.viewportHeight);
-			this.scrollerHeight = (this.scrollerHeight <= ScrollBox.SCROLLER_HEIGHT_MIN) ? ScrollBox.SCROLLER_HEIGHT_MIN : this.scrollerHeight;
-			this.scroller.style.height = this.scrollerHeight + 'px';
-		}
+      if (scroller.offsetTop < 0) scroller.style.top = '0px';
+      if (totalHeightScroller >= viewportHeight) {
+        scroller.style.top = maxOffsetScroller + 'px';
+      }
 
-		registerEventsHandler(e) {
-			this.contentBox.addEventListener('scroll', () => {
-				this.scroller.style.top = (this.contentBox.scrollTop * this.ratio) + 'px';
-			});
+      contentBox.scrollTo(0, shiftContent);
+      start = e.clientY;
+    });
+    document.addEventListener('mouseup', () => {
+      pressed = false
+    });
+  };
 
-			this.scroller.addEventListener('mousedown', e => {
-				this.start = e.clientY;
-				this.pressed = true;
-			});
+  function createScrollbar(ratio) {
+    scrollerHeight = parseInt(ratio * viewportHeight);
+    scrollerHeight = (scrollerHeight <= SCROLLER_HEIGHT_MIN) ? SCROLLER_HEIGHT_MIN : scrollerHeight;
+    scroller.style.height = scrollerHeight + 'px';
+  }
 
-			document.addEventListener('mousemove', this.drop.bind(this));
-			document.addEventListener('mouseup', () => this.pressed = false);
-		}
+  scrollbarInit();
 
-		drop(e) {
-			e.preventDefault();
-			if (this.pressed === false) return;
-
-			let shiftScroller = this.start - e.clientY;
-			this.scroller.style.top = (this.scroller.offsetTop - shiftScroller) + 'px';
-
-			let shiftContent = this.scroller.offsetTop / this.ratio;
-			const totalheightScroller = this.scroller.offsetHeight + this.scroller.offsetTop;
-			const maxOffsetScroller = this.viewportHeight - this.scroller.offsetHeight;
-
-			if (this.scroller.offsetTop < 0) this.scroller.style.top = '0px';
-			if (totalheightScroller >= this.viewportHeight) this.scroller.style.top = maxOffsetScroller + 'px';
-
-			this.contentBox.scrollTo(0, shiftContent);
-			this.start = e.clientY;
-		}
-	}
-
-	const scrollbox = new ScrollBox(container);
 })();

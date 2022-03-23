@@ -353,7 +353,6 @@ a, button {
 }
 
 .slide-2__viewport {
-  overflow: hidden;
   position: absolute;
   left: -50px;
   right: -2px;
@@ -404,12 +403,12 @@ a, button {
   font-weight: 500;
 }
 
-.scrollbar, .scroller {
+.slide-2__scrollbar, .slide-2__scroller {
   position: absolute;
   top: 0;
 }
 
-.scrollbar {
+.slide-2__scrollbar {
   bottom: 0;
   position: absolute;
   left: 13px;
@@ -418,9 +417,9 @@ a, button {
   background-color: black;
 }
 
-.scroller {
+.slide-2__scroller {
   position: absolute;
-  content: url(../img/scroll.png);
+  content: url(../img/scroll1.png);
   left: -11px;
   width: 26px;
   border-radius: 10px;

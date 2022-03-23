@@ -9,9 +9,6 @@ const babel = require('gulp-babel');
 const uglify = require('gulp-uglify-es').default
 const notify = require('gulp-notify');
 const sourcemaps = require('gulp-sourcemaps')
-// const del = require('del')
-// const gulpIf = require('gulp-if')
-// const argv = require('yargs').argv
 const browserSync = require('browser-sync').create();
 
 const styles = () => {
@@ -87,4 +84,3 @@ exports.htmlMinify = htmlMinify
 exports.scripts = scripts
 exports.default = series(htmlMinify, styles, scripts, images, fonts, watchFiles)
 
-// exports.default = series(clean, resources)
